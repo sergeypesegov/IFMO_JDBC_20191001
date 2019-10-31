@@ -16,10 +16,10 @@ public class RowMapperFactory {
                 @Override
                 public Employee mapRow(ResultSet rs) {
                     try {
-                        BigInteger id = BigInteger.valueOf(rs.getInt("ID"));
+                        BigInteger id = new BigInteger(rs.getString("ID"));
                         FullName fullname = new FullName(rs.getString("FIRSTNAME"),
                                 rs.getString("LASTNAME"),
-                                rs.getString("MIDDLENME"));
+                                rs.getString("MIDDLENAME"));
                         Position position = Position.valueOf(rs.getString("POSITION"));
                         //BigInteger manager = BigInteger.valueOf(rs.getInt("MANAGER"));
                         LocalDate hireDate = LocalDate.parse(rs.getString("HIREDATE"));
