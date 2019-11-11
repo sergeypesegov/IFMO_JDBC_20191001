@@ -15,24 +15,22 @@ import java.util.Set;
 public class SetMapperFactory {
 
     public SetMapper<Set<Employee>> employeesSetMapper() {
-        throw new UnsupportedOperationException();
-        SetMapper<Set<Employee>> result = new SetMapper<Set<Employee>>() {
-            @Override
-            public Set<Employee> mapSetEmployees(ResultSet rs) {
-                Set<Employee> list = new HashSet<Employee>();
-                try {
-                    while (rs.next()) {
-                        list.add(mapRow(rs));
-                    }
-                } catch (SQLException e) {
-                    return null;
+        //throw new UnsupportedOperationException();
+        return rs -> {
+            Set<Employee> list = new HashSet<>();
+            try {
+                while (rs.next()) {
+                    list.add(mapRow(rs));
                 }
                 return list;
+            } catch (SQLException e) {
+                e.printStackTrace();
+                return null;
             }
         };
-        return result;
+    }
 
-        private Employee mapRow(ResultSet rs) {
+        private Employee mapRow (ResultSet rs){
             try {
                 BigInteger id = new BigInteger(rs.getString("ID"));
                 FullName fullname = new FullName(rs.getString("FIRSTNAME"),
@@ -47,11 +45,11 @@ public class SetMapperFactory {
                 Employee manager = null;
 
                 if (rs.getString("MANAGER") != null) {
-                    BigInteger managerId = new BigInteger(rs.getString("MANAGER"));
+                    int managerId = rs.getInt("MANAGER");
                     int current = rs.getRow();
                     rs.beforeFirst();
-                    while (manager == null && rs.next()) {
-                        if (rs.getInt("ID") == managerId) {
+                    while (rs.next()) {
+                        if (Integer.parseInt(rs.getString("ID")) == managerId) {
                             manager = mapRow(rs);
                         }
                     }
@@ -60,10 +58,8 @@ public class SetMapperFactory {
 
                 Employee employee = new Employee(id, fullname, position, hireDate, salary, manager);
                 return employee;
-            }
-
-            catch (SQLException e) {
+            } catch (SQLException e) {
                 return null;
             }
-    }
-
+        }
+}
