@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.Optional;
 
 public class DaoFactory {
-    private List<Employee> allemployees = getEmployees();
+    private List<Employee> employees = getEmployees();
     private List<Department> alldepartments = getDepartment();
 
     private Connection createConnection() throws SQLException{
@@ -95,7 +95,7 @@ public class DaoFactory {
            @Override
            public List<Employee> getByDepartment(Department department) {
                List<Employee> empByDepartment = new ArrayList<>();
-               for (Employee emp : allemployees) {
+               for (Employee emp : employees) {
                    if (emp.getDepartmentId().equals(department.getId())) {
                        empByDepartment.add(emp);
                    }
@@ -106,7 +106,7 @@ public class DaoFactory {
            @Override
            public List<Employee> getByManager(Employee employee) {
                List<Employee> empByManager = new ArrayList<>();
-               for (Employee emp : allemployees) {
+               for (Employee emp : employees) {
                    if (emp.getManagerId().equals(employee.getId())) {
                        empByManager.add(emp);
                    }
@@ -117,7 +117,7 @@ public class DaoFactory {
            @Override
            public Optional<Employee> getById(BigInteger Id) {
                Optional<Employee> employee = Optional.empty();
-               for (Employee emp : allemployees) {
+               for (Employee emp : employees) {
                    if (emp.getId().equals(Id)) {
                        //employee.add(emp)  где-то здесь были потрачены 30 минут моей жизни,
                        //employee.set(emp)  чтобы понять, что с Optional нужно использовать .of()
@@ -129,13 +129,13 @@ public class DaoFactory {
 
            @Override
            public List<Employee> getAll() {
-               return allemployees;
+               return employees;
            }
 
            @Override
            public Employee save(Employee employee) {
                try {
-                   allemployees.add(employee);
+                   employees.add(employee);
                    return employee;
                }
                catch (Exception e){
@@ -146,7 +146,7 @@ public class DaoFactory {
            @Override
            public void delete(Employee employee) {
                try {
-                   allemployees.remove(employee);
+                   employees.remove(employee);
                }
                catch (Exception e) {
                    e.printStackTrace();
