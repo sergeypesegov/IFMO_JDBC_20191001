@@ -82,13 +82,34 @@ public class DaoFactory {
         }
     }
 
-    public Department getDepartment(ResultSet rs) throws SQLException {
-        BigInteger id = new BigInteger(rs.getString("ID"));
-        String name = rs.getString("NAME");
-        String location = rs.getString("LOCATION");
-        Department department = new Department(id, name, location);
-        return department;
+    private Department depMapRow(ResultSet rs) {
+        try {
+            BigInteger id = BigInteger.valueOf(rs.getInt("ID"));
+            String name = rs.getString("NAME");
+            String location = rs.getString("LOCATION");
+            Department dep = new Department(id, name, location);
+            return dep;
+
+        } catch (SQLException e) {
+            return null;
+        }
+
     }
+
+    public Department getDepartment() {
+        try {
+            ResultSet rs = createConnection().createStatement().executeQuery("SELECT * FROM DEPARTMENT");
+            List<Department> alldepartments = new LinkedList<>();
+            while (rs.next()) {
+                Department dep = depMapRow(rs);
+                alldepartments.add(dep);
+            }
+            return (Department) alldepartments;
+        } catch (SQLException e) {
+            return  null;
+        }
+    }
+    
 
     public EmployeeDao employeeDAO() {
        return new EmployeeDao() {
