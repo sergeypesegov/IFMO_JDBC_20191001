@@ -19,7 +19,7 @@ import java.util.Optional;
 
 public class DaoFactory {
     private List<Employee> employees = getEmployees();
-    private List<Department> alldepartments = getDepartment();
+    private List<Department> allDepartments = getDepartment();
 
     private Connection createConnection() throws SQLException{
         ConnectionSource connectionSource = ConnectionSource.instance();
@@ -96,20 +96,21 @@ public class DaoFactory {
 
     }
 
-    public Department getDepartment() {
+    private List<Department> getDepartment() {
         try {
             ResultSet rs = createConnection().createStatement().executeQuery("SELECT * FROM DEPARTMENT");
-            List<Department> alldepartments = new LinkedList<>();
+            List<Department> allDepartments = new ArrayList<>();
             while (rs.next()) {
                 Department dep = depMapRow(rs);
-                alldepartments.add(dep);
+                allDepartments.add(dep);
             }
-            return (Department) alldepartments;
+            return allDepartments ;
         } catch (SQLException e) {
-            return  null;
+            e.printStackTrace();
+            return null;
         }
     }
-    
+
 
     public EmployeeDao employeeDAO() {
        return new EmployeeDao() {
@@ -183,7 +184,7 @@ public class DaoFactory {
             @Override
             public Optional<Department> getById(BigInteger Id) {
                 Optional<Department> department = Optional.empty();
-                for (Department dep : alldepartments) {
+                for (Department dep : allDepartments) {
                     if (dep.getId().equals(Id)) {
                         department = department.of(dep);
                     }
@@ -193,14 +194,14 @@ public class DaoFactory {
 
             @Override
             public List<Department> getAll() {
-                return alldepartments;
+                return allDepartments;
             }
 
             @Override
             public Department save(Department department) {
                 try {
-                    for (Department dep : alldepartments) {
-                        alldepartments.remove(dep);
+                    for (Department dep : allDepartments) {
+                        allDepartments.remove(dep);
                     }
                 }
                 catch (Exception e) {
@@ -213,7 +214,7 @@ public class DaoFactory {
             @Override
             public void delete(Department department) {
                 try {
-                    alldepartments.remove(department);
+                    allDepartments.remove(department);
                 }
                 catch (Exception e) {
                     e.printStackTrace();
