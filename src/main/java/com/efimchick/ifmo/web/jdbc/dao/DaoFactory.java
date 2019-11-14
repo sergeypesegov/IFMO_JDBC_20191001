@@ -60,20 +60,12 @@ public class DaoFactory {
             BigDecimal salary = rs.getBigDecimal("SALARY");
             BigInteger department = BigInteger.valueOf(rs.getInt("DEPARTMENT"));
 
-            //Employee manager = null;
-            BigInteger manager = new BigInteger(rs.getString("MANAGER"));
+            BigInteger manager = BigInteger.valueOf(0);
 
-            /*if (rs.getString("MANAGER") != null) {
+            if (rs.getString("MANAGER") != null) {
                 int managerId = rs.getInt("MANAGER");
-                int current = rs.getRow();
-                rs.beforeFirst();
-                while (rs.next()) {
-                    if (Integer.parseInt(rs.getString("ID")) == managerId) {
-                        manager = mapRow(rs);
-                    }
-                }
-                rs.absolute(current);
-            }*/
+                manager = BigInteger.valueOf(managerId);
+            }
 
             Employee employee = new Employee(id, fullname, position, hireDate, salary, manager, department);
             return employee;
@@ -129,8 +121,13 @@ public class DaoFactory {
            public List<Employee> getByManager(Employee employee) {
                List<Employee> empByManager = new ArrayList<>();
                for (Employee emp : employees) {
-                   if (emp.getManagerId().equals(employee.getId())) {
-                       empByManager.add(emp);
+                   try {
+                       if (emp.getManagerId().equals(employee.getId())) {
+                           empByManager.add(emp);
+                       }
+                   }
+                   catch (NullPointerException e) {
+                       e.printStackTrace();
                    }
                }
                return empByManager;
