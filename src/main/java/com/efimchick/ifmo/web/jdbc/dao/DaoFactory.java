@@ -196,15 +196,12 @@ public class DaoFactory {
 
             @Override
             public Department save(Department department) {
-                try {
-                    for (Department dep : allDepartments) {
-                        allDepartments.remove(dep);
+                for (int i = 0; i < allDepartments.size(); i++) {
+                    if (allDepartments.get(i).getId().equals(department.getId())) {
+                        allDepartments.remove(allDepartments.get(i));
                     }
                 }
-                catch (Exception e) {
-                    e.printStackTrace();
-                }
-
+                allDepartments.add(department);
                 return department;
             }
 
