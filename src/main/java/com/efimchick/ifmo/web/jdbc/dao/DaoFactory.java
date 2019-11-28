@@ -9,11 +9,9 @@ import com.efimchick.ifmo.web.jdbc.domain.Position;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.sql.*;
+import java.sql.Date;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 public class DaoFactory {
 
@@ -209,38 +207,37 @@ public class DaoFactory {
         };
     }
 
-    public DepartmentDao departmentDAO() {
-        //throw new UnsupportedOperationException();
-        return new DepartmentDao() {
-
-            private List<Department> getDepartments(ResultSet resultSet) throws SQLException {
-                resultSet.beforeFirst();
-                List<Department> departments = new ArrayList<>();
-                try {
-                    while (resultSet.next()) {
-                        departments.add(
-                                new Department(
-                                        new BigInteger(resultSet.getString("ID")),
-                                        resultSet.getString("NAME"),
-                                        resultSet.getString("LOCATION")
-                                )
-                        );
-                    }
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-                return departments;
+    private List<Department> getDepartments(ResultSet resultSet) throws SQLException {
+        resultSet.beforeFirst();
+        List<Department> departments = new ArrayList<>();
+        try {
+            while (resultSet.next()) {
+                departments.add(
+                        new Department(
+                                new BigInteger(resultSet.getString("ID")),
+                                resultSet.getString("NAME"),
+                                resultSet.getString("LOCATION")
+                        )
+                );
             }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return departments;
+    }
+
+    public DepartmentDao departmentDAO() {
+        return new DepartmentDao() {
 
             @Override
             public Optional<Department> getById(BigInteger Id) {
                 try {
                     ResultSet res = getResultSet("SELECT * FROM department WHERE id = " + Id);
-                    if (res.next() != true) {
-                        return null;
-                    } else {
+                    if (res.next()) {
                         List<Department> dep = getDepartments(res);
                         return Optional.of(dep.get(0));
+                    } else {
+                        return Optional.empty();
                     }
                 } catch (SQLException e) {
                     e.printStackTrace();
@@ -258,18 +255,20 @@ public class DaoFactory {
                 return null;
             }
 
+
+
             @Override
             public Department save(Department department) {
                 try {
-                    if (getById(department.getId()).equals(Optional.empty())) {
-                        getResultSet(
+                    if (Objects.equals(getById(department.getId()), Optional.empty())) {
+                        ConnectionSource.instance().createConnection().createStatement().executeUpdate(
                                 "INSERT INTO department VALUES ('" +
                                         department.getId()       + "', '" +
                                         department.getName()     + "', '" +
                                         department.getLocation() + "')"
                         );
                     } else {
-                        getResultSet(
+                        ConnectionSource.instance().createConnection().createStatement().executeUpdate(
                                 "UPDATE department SET " +
                                         "NAME = '"     + department.getName()     + "', " +
                                         "LOCATION = '" + department.getLocation() + "' " +
